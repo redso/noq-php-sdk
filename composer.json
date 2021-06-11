@@ -1,0 +1,33 @@
+{
+  "name": "noq/roomq",
+  "description": "NoQ RoomQ",
+  "homepage": "",
+  "keywords": [
+    "php",
+    "noq",
+    "roomq"
+  ],
+  "authors": [
+    {
+      "name": "Edwin Kwok",
+      "email": "edwinkcw@redso.com.hk",
+      "role": "Developer"
+    },
+    {
+      "name": "Paulo Lam",
+      "email": "paulo@redso.com.hk",
+      "role": "Developer"
+    }
+  ],
+  "license": "BSD-3-Clause",
+  "require": {
+    "php": ">=7.4.0",
+    "firebase/php-jwt": "^5.3",
+    "ramsey/uuid": "^4.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "NoQ\\RoomQ\\": "src"
+    }
+  }
+}
