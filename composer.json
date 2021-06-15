@@ -21,7 +21,7 @@
   ],
   "license": "BSD-3-Clause",
   "require": {
-    "php": ">=7.4.0",
+    "php": ">=7.3.0",
     "firebase/php-jwt": "^5.3",
     "ramsey/uuid": "^4.1"
   },
