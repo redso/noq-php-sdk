@@ -2,7 +2,7 @@
 
 namespace NoQ\RoomQ;
 
-require __DIR__ . '/../../../vendor/autoload.php';
+require __DIR__ . '/../../../autoload.php';
 
 use Exception;
 use Firebase\JWT\JWT;
