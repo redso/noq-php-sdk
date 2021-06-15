@@ -2,8 +2,9 @@
 
 namespace NoQ\RoomQ;
 
-require __DIR__ . './../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
+use Exception;
 use Firebase\JWT\JWT;
 use Ramsey\Uuid\Uuid;
 
@@ -24,7 +25,7 @@ class RoomQ
         $this->tokenName = "be_roomq_t_{$clientID}";
     }
 
-    public function validate($returnURL, $sessionId)
+    public function validate($returnURL, $sessionId): ValidationResult
     {
         $token = null;
 
@@ -87,17 +88,17 @@ class RoomQ
         }
     }
 
-    private function enter($currentUrl): ?string
+    private function enter($currentUrl): ValidationResult
     {
         $urlWithoutToken = $this->removeNoQToken($currentUrl);
         // redirect if url contain token
         if ($urlWithoutToken !== $currentUrl) {
-            return $urlWithoutToken;
+            return new ValidationResult($urlWithoutToken);
         }
-        return null;
+        return new ValidationResult(null);
     }
 
-    private function redirectToTicketIssuer($token, $currentURL): string
+    private function redirectToTicketIssuer($token, $currentURL): ValidationResult
     {
         $urlWithoutToken = $this->removeNoQToken($currentURL);
         $params = array(
@@ -106,7 +107,7 @@ class RoomQ
             'noq_r' => $urlWithoutToken
         );
         $query = http_build_query($params);
-        return "{$this->ticketIssuer}?{$query}";
+        return new ValidationResult("{$this->ticketIssuer}?{$query}");
     }
 
     private function generateJWT($sessionId): string
