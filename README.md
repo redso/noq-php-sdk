@@ -1,6 +1,9 @@
 # Install
 
-> Download latest composer package from [here.](https://packagist.org/packages/noq/roomq)
+> Download the latest composer package from [here.](https://packagist.org/packages/noq/roomq)
+```shell
+composer require noq/roomq
+```
 
 # RoomQ Backend SDK - PHP
 
@@ -15,7 +18,7 @@ The [RoomQ](https://www.noq.hk/en/roomq) Backend SDK is used for server-side int
 3.  End user obtain a ticket and wait in the queue until the ticket turns into Serving state.
 4.  End user is redirected back to your website, now with a valid ticket
 5.  The SDK verify if the request contain a valid ticket and in Serving state. End user stay in the requested page.
-6.  The end user browses to a new page and the SDK continue to check if the ticket is valid.
+6.  The end user browses to a new page, and the SDK continue to check if the ticket is valid.
 
 ## How to integrate
 
@@ -45,7 +48,7 @@ You can determine the requests type before pass it to the validation.
 
 ## Implementation Example
 
-The following is an RoomQ integration example in express/nodejs.
+The following is an RoomQ integration example in php.
 
 ```php
 <?php
