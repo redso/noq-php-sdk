@@ -23,7 +23,8 @@
   "require": {
     "php": ">=7.3.0",
     "firebase/php-jwt": "^5.3",
-    "ramsey/uuid": "^4.1"
+    "ramsey/uuid": "^4.1",
+    "guzzlehttp/guzzle": "^7.0"
   },
   "autoload": {
     "psr-4": {

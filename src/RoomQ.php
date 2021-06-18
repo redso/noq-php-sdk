@@ -2,8 +2,6 @@
 
 namespace NoQ\RoomQ;
 
-require __DIR__ . '/../../../autoload.php';
-
 use Exception;
 use Firebase\JWT\JWT;
 use Ramsey\Uuid\Uuid;
@@ -86,6 +84,17 @@ class RoomQ
         } else {
             return $this->enter($currentURL);
         }
+    }
+
+    public function getLocker($apiKey, $isDev = false): Locker {
+        $token = null;
+
+        if (isset($_GET["noq_t"])) {
+            $token = $_GET["noq_t"];
+        } else if (isset($_COOKIE[$this->tokenName])) {
+            $token = $_COOKIE[$this->tokenName];
+        }
+        return new Locker($this->clientID, $apiKey, $token, $isDev);
     }
 
     private function enter($currentUrl): ValidationResult

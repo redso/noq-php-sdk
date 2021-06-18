@@ -53,28 +53,33 @@ The following is an RoomQ integration example in php.
 ```php
 <?php
 require __DIR__ . '/../vendor/autoload.php';
-require __DIR__ . '/../noq/roomq/src/RoomQ.php';
 
 use NoQ\RoomQ\RoomQ;
+use NoQ\RoomQ\LockerItem;
 
-const ROOM_ID = "YOUR ROOM ID";
-const ROOM_SECRET = "YOUR ROOM SECRET";
-const ROOMQ_TICKET_ISSUER = "YOUR TICKET ISSUER";
+const ROOM_ID = "ROOM ID";
+const ROOM_SECRET = "ROOM SECRET";
+const ROOMQ_TICKET_ISSUER = "TICKET ISSER URL";
+const API_KEY = "API KEY";
 
 $roomq = new RoomQ(ROOM_ID, ROOM_SECRET, ROOMQ_TICKET_ISSUER, false);
 
-// The URL of the destination after user finish queuing in the waiting room
-// If set null, the default behaviour is return to the current path
-// If this is handling a POST request, it should not set null.
-$returnURL = null;
-
-$result = $roomq->validate($returnURL, "");
+$result = $roomq->validate(null, "");
 if ($result->needRedirect()) {
     header("Location: {$result->getRedirectURL()}");
     exit;
 }
-
 echo "Entered";
+
+// Locker API
+
+$locker = $roomq->getLocker(API_KEY);
+$locker->put([
+    new LockerItem("key1", "value1", 1, 5),
+    new LockerItem("key2", "value2", 1, 5),
+], time() + 100000);
+print_r(json_encode($locker->fetch()));
+print_r($locker->findSessions("string", "string"));
 ```
 
 ### Ajax calls
