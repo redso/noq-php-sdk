@@ -63,23 +63,57 @@ const ROOMQ_TICKET_ISSUER = "TICKET ISSER URL";
 const API_KEY = "API KEY";
 
 $roomq = new RoomQ(ROOM_ID, ROOM_SECRET, ROOMQ_TICKET_ISSUER, false);
-
-$result = $roomq->validate(null, "");
+$result = $roomq->validate(null, "session id");
 if ($result->needRedirect()) {
     header("Location: {$result->getRedirectURL()}");
     exit;
 }
+
+try {
+    echo $roomq->getServing();
+} catch (NotServingException $e) {
+    // not serving
+} catch (InvalidTokenException $e) {
+    // token invalid
+} catch (Exception $e) {
+    // other server issue
+}
+
+$locker = $roomq->getLocker(API_KEY, true);
+
+/** Put data in locker */
+try {
+    $locker->put([
+        new LockerItem("key1", "value1", 1, 5),
+        new LockerItem("key2", "value2", 1, 5),
+    ], time() + 100000);
+} catch (InvalidApiKeyException $e) {
+    // invalid api key
+} catch (ReachLimitException $e) {
+    // limit reached in the locker
+} catch (Exception $e) {
+    // other server issue
+}
+
+/** Find key value pairs inside current locker */
+try {
+    print_r(json_encode($locker->fetch()));
+} catch (InvalidApiKeyException $e) {
+    // invalid api key
+} catch (Exception $e) {
+    // other server issue
+}
+
+/** Find sessions with key and value */
+try {
+    print_r($locker->findSessions("string", "string"));
+} catch (InvalidApiKeyException $e) {
+    // invalid api key
+} catch (Exception $e) {
+    // other server issue
+}
+
 echo "Entered";
-
-// Locker API
-
-$locker = $roomq->getLocker(API_KEY);
-$locker->put([
-    new LockerItem("key1", "value1", 1, 5),
-    new LockerItem("key2", "value2", 1, 5),
-], time() + 100000);
-print_r(json_encode($locker->fetch()));
-print_r($locker->findSessions("string", "string"));
 ```
 
 ### Ajax calls

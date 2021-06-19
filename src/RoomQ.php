@@ -4,6 +4,12 @@ namespace NoQ\RoomQ;
 
 use Exception;
 use Firebase\JWT\JWT;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ClientException;
+use GuzzleHttp\Exception\GuzzleException;
+use NoQ\RoomQ\Exception\InvalidTokenException;
+use NoQ\RoomQ\Exception\NotServingException;
+use NoQ\RoomQ\Exception\QueueStoppedException;
 use Ramsey\Uuid\Uuid;
 
 class RoomQ
@@ -86,15 +92,52 @@ class RoomQ
         }
     }
 
-    public function getLocker($apiKey, $isDev = false): Locker {
+    public function getLocker($apiKey, $isDev = false): Locker
+    {
         $token = null;
-
         if (isset($_GET["noq_t"])) {
             $token = $_GET["noq_t"];
         } else if (isset($_COOKIE[$this->tokenName])) {
             $token = $_COOKIE[$this->tokenName];
         }
         return new Locker($this->clientID, $apiKey, $token, $isDev);
+    }
+
+    /**
+     * @throws GuzzleException
+     * @throws QueueStoppedException|InvalidTokenException|NotServingException
+     */
+    public function getServing(): int
+    {
+        $token = null;
+        if (isset($_GET["noq_t"])) {
+            $token = $_GET["noq_t"];
+        } else if (isset($_COOKIE[$this->tokenName])) {
+            $token = $_COOKIE[$this->tokenName];
+        }
+
+        $httpClient = new Client();
+        $response = $httpClient->get("https://roomq-dev.noqstatus.com/api/rooms/{$this->clientID}");
+        $json = json_decode($response->getBody(), true);
+        $state = $json["state"];
+        if ($state == "stopped") {
+            throw new QueueStoppedException();
+        }
+        $backend = $json["backend"];
+
+        try {
+            $response = $httpClient->get("https://{$backend}/rooms/{$this->clientID}/servings/{$token}");
+            $json = json_decode($response->getBody(), true);
+            return $json["deadline"];
+        } catch (ClientException $e) {
+            if ($e->getResponse()->getStatusCode() == 401) {
+                throw new InvalidTokenException();
+            } else if ($e->getResponse()->getStatusCode() == 401) {
+                throw new NotServingException();
+            } else {
+                throw $e;
+            }
+        }
     }
 
     private function enter($currentUrl): ValidationResult

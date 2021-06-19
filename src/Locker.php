@@ -6,6 +6,8 @@ use Exception;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
+use NoQ\RoomQ\Exception\InvalidApiKeyException;
+use NoQ\RoomQ\Exception\ReachLimitException;
 
 class Locker
 {
@@ -26,7 +28,7 @@ class Locker
     }
 
     /**
-     * @throws Exception|GuzzleException
+     * @throws InvalidApiKeyException|GuzzleException
      */
     public function findSessions($key, $value)
     {
@@ -45,7 +47,7 @@ class Locker
             return json_decode($response->getBody(), true)['sessions'];
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
-                throw new Exception("Invalid api-key");
+                throw new InvalidApiKeyException();
             } else {
                 throw $e;
             }
@@ -54,7 +56,7 @@ class Locker
 
     /**
      * @throws GuzzleException
-     * @throws Exception
+     * @throws InvalidApiKeyException
      */
     public function fetch()
     {
@@ -69,7 +71,7 @@ class Locker
             return json_decode($response->getBody(), true);
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
-                throw new Exception("Invalid api-key");
+                throw new InvalidApiKeyException();
             } else {
                 throw $e;
             }
@@ -79,7 +81,7 @@ class Locker
     /**
      * @param array $items
      * @param integer $expireAt
-     * @throws Exception|GuzzleException
+     * @throws ReachLimitException|InvalidApiKeyException|GuzzleException
      */
     public function put(array $items, int $expireAt)
     {
@@ -104,9 +106,9 @@ class Locker
             );
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
-                throw new Exception("Invalid api-key");
+                throw new InvalidApiKeyException();
             } else if ($e->getResponse()->getStatusCode() == 403) {
-                throw new Exception("Reached limit");
+                throw new ReachLimitException();
             } else {
                 throw $e;
             }
@@ -116,7 +118,7 @@ class Locker
     /**
      * @param string $key
      * @throws GuzzleException
-     * @throws Exception
+     * @throws InvalidApiKeyException
      */
     public function delete(string $key)
     {
@@ -130,7 +132,7 @@ class Locker
             );
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
-                throw new Exception("Invalid api-key");
+                throw new InvalidApiKeyException();
             } else {
                 throw $e;
             }
@@ -139,7 +141,7 @@ class Locker
 
     /**
      * @throws GuzzleException
-     * @throws Exception
+     * @throws InvalidApiKeyException
      */
     public function flush()
     {
@@ -154,7 +156,7 @@ class Locker
             );
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
-                throw new Exception("Invalid api-key");
+                throw new InvalidApiKeyException();
             } else {
                 throw $e;
             }
