@@ -71,6 +71,8 @@ if ($result->needRedirect()) {
 
 try {
     echo $roomq->getServing();
+    $roomq->deleteServing(); // delete serving
+    $roomq->extend(60);  // extend in minutes
 } catch (NotServingException $e) {
     // not serving
 } catch (InvalidTokenException $e) {
@@ -125,6 +127,3 @@ RoomQ doesn't support validate ticket in Ajax calls yet.
 If your responses are cached on browser or CDN, the new requests will not process by RoomQ.
 In general, for the page / path integrated with RoomQ, you are not likely to cache the responses on CDN or browser.
 
-### Delete Ticket / Extend Ticket
-
-Delete or Extend Ticket are not supported in backend SDK integration.
