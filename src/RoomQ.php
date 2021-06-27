@@ -134,7 +134,7 @@ class RoomQ
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
                 throw new InvalidTokenException();
-            } else if ($e->getResponse()->getStatusCode() == 401) {
+            } else if ($e->getResponse()->getStatusCode() == 404) {
                 throw new NotServingException();
             } else {
                 throw $e;
@@ -159,7 +159,7 @@ class RoomQ
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
                 throw new InvalidTokenException();
-            } else if ($e->getResponse()->getStatusCode() == 401) {
+            } else if ($e->getResponse()->getStatusCode() == 404) {
                 throw new NotServingException();
             } else {
                 throw $e;
@@ -194,7 +194,7 @@ class RoomQ
         } catch (ClientException $e) {
             if ($e->getResponse()->getStatusCode() == 401) {
                 throw new InvalidTokenException();
-            } else if ($e->getResponse()->getStatusCode() == 401) {
+            } else if ($e->getResponse()->getStatusCode() == 404) {
                 throw new NotServingException();
             } else {
                 throw $e;
