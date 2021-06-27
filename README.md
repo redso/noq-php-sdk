@@ -1,6 +1,7 @@
 # Install
 
 > Download the latest composer package from [here.](https://packagist.org/packages/noq/roomq)
+
 ```shell
 composer require noq/roomq
 ```
@@ -56,6 +57,10 @@ require __DIR__ . '/../vendor/autoload.php';
 
 use NoQ\RoomQ\RoomQ;
 use NoQ\RoomQ\LockerItem;
+use NoQ\RoomQ\Exception\NotServingException;
+use NoQ\RoomQ\Exception\InvalidTokenException;
+use NoQ\RoomQ\Exception\InvalidApiKeyException;
+use NoQ\RoomQ\Exception\ReachLimitException;
 
 const ROOM_ID = "ROOM ID";
 const ROOM_SECRET = "ROOM SECRET";
@@ -126,4 +131,3 @@ RoomQ doesn't support validate ticket in Ajax calls yet.
 
 If your responses are cached on browser or CDN, the new requests will not process by RoomQ.
 In general, for the page / path integrated with RoomQ, you are not likely to cache the responses on CDN or browser.
-
