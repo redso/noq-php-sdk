@@ -243,7 +243,7 @@ class RoomQ
     private function removeNoQToken($currentUrl): string
     {
         $updated = preg_replace('/([&]*)(noq_t=[^&]*)/i', '', $currentUrl);
-        $updated = preg_replace('/\\?&/i', '', $updated);
+        $updated = preg_replace('/\\?&/i', '?', $updated);
         return preg_replace('/\\?$/i', '', $updated);
     }
 
