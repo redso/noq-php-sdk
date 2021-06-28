@@ -66,6 +66,7 @@ const ROOM_ID = "ROOM ID";
 const ROOM_SECRET = "ROOM SECRET";
 const ROOMQ_TICKET_ISSUER = "TICKET ISSER URL";
 const API_KEY = "API KEY";
+const LOCKER_URL = "LOCKER URL";
 
 $roomq = new RoomQ(ROOM_ID, ROOM_SECRET, ROOMQ_TICKET_ISSUER, false);
 $result = $roomq->validate(null, "session id");
@@ -86,7 +87,7 @@ try {
     // other server issue
 }
 
-$locker = $roomq->getLocker(API_KEY, true);
+$locker = $roomq->getLocker(API_KEY, LOCKER_URL);
 
 /** Put data in locker */
 try {

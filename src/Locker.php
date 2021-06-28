@@ -16,14 +16,14 @@ class Locker
     private $apiKey;
     private $httpClient;
 
-    public function __construct($clientID, $apiKey, $token, $isDev)
+    public function __construct($clientID, $apiKey, $token, $url)
     {
         $this->clientID = $clientID;
         $this->apiKey = $apiKey;
         $this->token = $token;
 
         $this->httpClient = new Client([
-            'base_uri' => $isDev ? 'https://roomq-locker-dev.noq.guru' : 'https://roomq-locker.noq.guru',
+            'base_uri' => $url,
         ]);
     }
 

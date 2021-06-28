@@ -22,7 +22,7 @@ class RoomQ
     private $token;
     private $statusEndpoint;
 
-    public function __construct($clientID, $jwtSecret, $ticketIssuer, $statusEndpoint = 'https://roomq-dev.noqstatus.com/api/rooms', $debug = false)
+    public function __construct($clientID, $jwtSecret, $ticketIssuer, $statusEndpoint, $debug = false)
     {
         $this->clientID = $clientID;
         $this->jwtSecret = $jwtSecret;
@@ -104,9 +104,9 @@ class RoomQ
         }
     }
 
-    public function getLocker($apiKey, $isDev = false): Locker
+    public function getLocker($apiKey, $url): Locker
     {
-        return new Locker($this->clientID, $apiKey, $this->token, $isDev);
+        return new Locker($this->clientID, $apiKey, $this->token, $url);
     }
 
     /**
