@@ -30,6 +30,9 @@ To integrate with the SDK, you need to have the following information provided b
 1.  ROOM_ID
 2.  ROOM_SECRET
 3.  ROOMQ_TICKET_ISSUER
+4.  ROOMQ_STATUS_API
+5.  API_KEY
+6.  LOCKER_URL
 
 ### Major steps
 
@@ -65,63 +68,96 @@ use NoQ\RoomQ\Exception\ReachLimitException;
 const ROOM_ID = "ROOM ID";
 const ROOM_SECRET = "ROOM SECRET";
 const ROOMQ_TICKET_ISSUER = "TICKET ISSER URL";
+const ROOMQ_STATUS_API = "STATUS API";
 const API_KEY = "API KEY";
 const LOCKER_URL = "LOCKER URL";
 
-$roomq = new RoomQ(ROOM_ID, ROOM_SECRET, ROOMQ_TICKET_ISSUER, false);
-$result = $roomq->validate(null, "session id");
-if ($result->needRedirect()) {
-    header("Location: {$result->getRedirectURL()}");
-    exit;
+$roomq = new RoomQ(ROOM_ID, ROOM_SECRET, ROOMQ_TICKET_ISSUER, ROOMQ_STATUS_API, false);
+
+// Handle GET requests
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+
+    // Check if the request has valid ticket
+    // If "session id" is null, SDK will generate UUID as "session id"
+    $result = $roomq->validate(null, "session id");
+    if ($result->needRedirect()) {
+        header("Location: {$result->getRedirectURL()}");
+        exit;
+    }
+
+    try {
+        // Retrieve the expiry time of the ticket
+        echo $roomq->getServing();
+    } catch (NotServingException $e) {
+        // Ticket is not in serving state
+    } catch (InvalidTokenException $e) {
+        // Ticket is invalid
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+
+    try {
+        // Delete Ticket
+        $roomq->deleteServing();
+    } catch (NotServingException $e) {
+        // Ticket is not in serving state
+    } catch (InvalidTokenException $e) {
+        // Ticket is invalid
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+
+    try {
+        // Extend Ticket's expiry time
+        // Please enable this feature in Web Portal as well
+        $roomq->extend(60);  
+    } catch (NotServingException $e) {
+        // Ticket is not in serving state
+    } catch (InvalidTokenException $e) {
+        // Ticket is invalid
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+    // Locker Function
+    $locker = $roomq->getLocker(API_KEY, LOCKER_URL);
+
+    /** Put data in locker */
+    try {
+        $locker->put([
+            new LockerItem("key1", "value1", 1, 5),
+            new LockerItem("key2", "value2", 1, 5),
+        ], time() + 600); // expire after 10 minutes
+    } catch (InvalidApiKeyException $e) {
+        // invalid api key
+    } catch (ReachLimitException $e) {
+        // limit reached in the locker
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+    /** Find key value pairs inside current locker */
+    try {
+        print_r(json_encode($locker->fetch()));
+    } catch (InvalidApiKeyException $e) {
+        // invalid api key
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+    /** Find sessions with key and value */
+    try {
+        print_r($locker->findSessions("string", "string"));
+    } catch (InvalidApiKeyException $e) {
+        // invalid api key
+    } catch (Exception $e) {
+        // other server issue
+    }
+
+    echo "Entered";
 }
-
-try {
-    echo $roomq->getServing();
-    $roomq->deleteServing(); // delete serving
-    $roomq->extend(60);  // extend in minutes
-} catch (NotServingException $e) {
-    // not serving
-} catch (InvalidTokenException $e) {
-    // token invalid
-} catch (Exception $e) {
-    // other server issue
-}
-
-$locker = $roomq->getLocker(API_KEY, LOCKER_URL);
-
-/** Put data in locker */
-try {
-    $locker->put([
-        new LockerItem("key1", "value1", 1, 5),
-        new LockerItem("key2", "value2", 1, 5),
-    ], time() + 100000);
-} catch (InvalidApiKeyException $e) {
-    // invalid api key
-} catch (ReachLimitException $e) {
-    // limit reached in the locker
-} catch (Exception $e) {
-    // other server issue
-}
-
-/** Find key value pairs inside current locker */
-try {
-    print_r(json_encode($locker->fetch()));
-} catch (InvalidApiKeyException $e) {
-    // invalid api key
-} catch (Exception $e) {
-    // other server issue
-}
-
-/** Find sessions with key and value */
-try {
-    print_r($locker->findSessions("string", "string"));
-} catch (InvalidApiKeyException $e) {
-    // invalid api key
-} catch (Exception $e) {
-    // other server issue
-}
-
-echo "Entered";
 ```
 
 ### Ajax calls
@@ -132,3 +168,7 @@ RoomQ doesn't support validate ticket in Ajax calls yet.
 
 If your responses are cached on browser or CDN, the new requests will not process by RoomQ.
 In general, for the page / path integrated with RoomQ, you are not likely to cache the responses on CDN or browser.
+
+### Hash of URL
+
+As hash of URL will not send to server, hash information will be lost.
