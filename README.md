@@ -112,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     try {
         // Extend Ticket's expiry time
         // Please enable this feature in Web Portal as well
-        $roomq->extend(60);  
+        $roomq->extend(60);
     } catch (NotServingException $e) {
         // Ticket is not in serving state
     } catch (InvalidTokenException $e) {
@@ -172,3 +172,10 @@ In general, for the page / path integrated with RoomQ, you are not likely to cac
 ### Hash of URL
 
 As hash of URL will not send to server, hash information will be lost.
+
+## Version Guidance
+
+| Version | Packagist   | PSR-7 | PHP Version |
+| ------- | ----------- | ----- | ----------- |
+| 1.x     | `noq/roomq` | Yes   | >= 5.5      |
+| 2.x     | `noq/roomq` | Yes   | >= 7.3      |
