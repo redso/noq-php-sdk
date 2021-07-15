@@ -16,7 +16,7 @@ class LockerItem
      * @param integer $limit max number of values can be stored in this key
      * @param integer $kvLimit max number of this key-value pair can be stored in all the lockers in this room
      */
-    public function __construct(string $key, string $value, int $limit, int $kvLimit)
+    public function __construct($key, $value, $limit, $kvLimit)
     {
         $this->key = $key;
         $this->value = $value;

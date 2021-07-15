@@ -83,7 +83,7 @@ class Locker
      * @param integer $expireAt
      * @throws ReachLimitException|InvalidApiKeyException|GuzzleException
      */
-    public function put(array $items, int $expireAt)
+    public function put($items, $expireAt)
     {
         try {
             $this->httpClient->put("/api/lockers/" . urlencode($this->clientID) . "/sessions/" . urlencode($this->token),
@@ -120,7 +120,7 @@ class Locker
      * @throws GuzzleException
      * @throws InvalidApiKeyException
      */
-    public function delete(string $key)
+    public function delete($key)
     {
         try {
             $this->httpClient->delete("/api/lockers/" . urlencode($this->clientID) . "/sessions/" . urlencode($this->token) . "/" . $key,

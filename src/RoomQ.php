@@ -36,7 +36,7 @@ class RoomQ
     /**
      * @return string|null
      */
-    private function getToken(): ?string
+    private function getToken()
     {
         $token = null;
         if (isset($_GET["noq_t"])) {
@@ -47,7 +47,7 @@ class RoomQ
         return $token;
     }
 
-    public function validate($returnURL, $sessionId): ValidationResult
+    public function validate($returnURL, $sessionId)
     {
         $token = $this->token;
         $currentURL = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
@@ -98,13 +98,13 @@ class RoomQ
         setcookie($this->tokenName, $token, time() + (12 * 60 * 60), "");
 
         if ($needRedirect) {
-            return $this->redirectToTicketIssuer($token, $returnURL ?? $currentURL);
+            return $this->redirectToTicketIssuer($token, isset($returnURL) ?  $returnURL : $currentURL);
         } else {
             return $this->enter($currentURL);
         }
     }
 
-    public function getLocker($apiKey, $url): Locker
+    public function getLocker($apiKey, $url)
     {
         return new Locker($this->clientID, $apiKey, $this->token, $url);
     }
@@ -146,7 +146,7 @@ class RoomQ
      * @throws GuzzleException
      * @throws QueueStoppedException|InvalidTokenException|NotServingException
      */
-    public function getServing(): int
+    public function getServing()
     {
         $backend = $this->getBackend();
 
@@ -202,7 +202,7 @@ class RoomQ
         }
     }
 
-    private function enter($currentUrl): ValidationResult
+    private function enter($currentUrl)
     {
         $urlWithoutToken = $this->removeNoQToken($currentUrl);
         // redirect if url contain token
@@ -212,7 +212,7 @@ class RoomQ
         return new ValidationResult(null);
     }
 
-    private function redirectToTicketIssuer($token, $currentURL): ValidationResult
+    private function redirectToTicketIssuer($token, $currentURL)
     {
         $urlWithoutToken = $this->removeNoQToken($currentURL);
         $params = array(
@@ -224,11 +224,11 @@ class RoomQ
         return new ValidationResult("{$this->ticketIssuer}?{$query}");
     }
 
-    private function generateJWT($sessionId): string
+    private function generateJWT($sessionId)
     {
         return JWT::encode(array(
             "room_id" => $this->clientID,
-            "session_id" => $sessionId ?? Uuid::uuid4()->toString(),
+            "session_id" => isset($sessionId) ? $sessionId : Uuid::uuid4()->toString(),
             "type" => "self-sign",
         ), $this->jwtSecret);
     }
@@ -240,7 +240,7 @@ class RoomQ
         }
     }
 
-    private function removeNoQToken($currentUrl): string
+    private function removeNoQToken($currentUrl)
     {
         $updated = preg_replace('/([&]*)(noq_t=[^&]*)/i', '', $currentUrl);
         $updated = preg_replace('/\\?&/i', '?', $updated);
@@ -252,7 +252,7 @@ class RoomQ
      * @throws GuzzleException
      * @throws QueueStoppedException
      */
-    public function getBackend(): string
+    public function getBackend()
     {
         $httpClient = new Client();
         $response = $httpClient->get("{$this->statusEndpoint}/{$this->clientID}");
