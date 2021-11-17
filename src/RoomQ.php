@@ -4,6 +4,7 @@ namespace NoQ\RoomQ;
 
 use Exception;
 use Firebase\JWT\JWT;
+use Firebase\JWT\SignatureInvalidException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ClientException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -265,5 +266,28 @@ class RoomQ
         return $backend;
     }
 
-
+    /**
+     * @return string
+     * @throws InvalidTokenException|NotServingException
+     */
+    public function getTicketID(): string
+    {
+        try {
+            $token = $this->getToken();
+            if ($token == null) {
+                throw new NotServingException();
+            }
+            JWT::$leeway = PHP_INT_MAX / 2;
+            $payload = JWT::decode($token, $this->jwtSecret, array('HS256'));
+            JWT::$leeway = 0;
+            if (!property_exists($payload, "session_id")) {
+                throw new InvalidTokenException();
+            }
+            return $payload->session_id;
+        } catch (SignatureInvalidException $e) {
+            throw new InvalidTokenException();
+        } catch (Exception $e) {
+            throw new InvalidTokenException();
+        }
+    }
 }
