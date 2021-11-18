@@ -273,7 +273,7 @@ class RoomQ
     public function getTicketID(): string
     {
         try {
-            $token = $this->getToken();
+            $token = $this->token;
             if ($token == null) {
                 throw new NotServingException();
             }
