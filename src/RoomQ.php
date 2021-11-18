@@ -172,7 +172,7 @@ class RoomQ
      * @throws GuzzleException
      * @throws QueueStoppedException|InvalidTokenException|NotServingException
      */
-    public function deleteServing()
+    public function deleteServing($keepSessionId = false)
     {
         $backend = $this->getBackend();
 
@@ -189,7 +189,7 @@ class RoomQ
             JWT::$leeway = PHP_INT_MAX / 2;
             $payload = JWT::decode($this->token, $this->jwtSecret, array('HS256'));
             JWT::$leeway = 0;
-            $token = $this->generateJWT($payload->session_id);
+            $token = $this->generateJWT($keepSessionId ? $payload->session_id : null);
             $this->token = $token;
             setcookie($this->tokenName, $token, time() + (12 * 60 * 60), "");
         } catch (ClientException $e) {
